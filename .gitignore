@@ -61,6 +61,7 @@ frontend/*.log
 # Documentation Sphinx generee
 docs/_build/
 
+<<<<<<< HEAD
 # Sorties reproductibles des notebooks
 notebooks/outputs/
 notebooks/.ipynb_checkpoints/
@@ -68,3 +69,8 @@ notebooks/.ipython/
 notebooks/.jupyter/
 notebooks/.jupyter_data/
 notebooks/.jupyter_runtime/
+=======
+# Frontend local tooling
+frontend/bun.lockb
+frontend/*.tsbuildinfo
+>>>>>>> origin/develop
