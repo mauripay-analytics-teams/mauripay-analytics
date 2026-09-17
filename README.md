@@ -58,6 +58,7 @@ data/         datasets générés et fichiers chargés
 tests/        tests Python
 benchmarks/   scripts et résultats de performance
 docs/         documentation Sphinx et MyST
+notebooks/    expériences pédagogiques reproductibles
 ```
 
 ## Installation rapide
@@ -122,6 +123,17 @@ Ouvrez ensuite `docs/_build/html/index.html` dans un navigateur.
 
 La documentation Read the Docs sera ajoutée ici dès que le projet aura été
 importé et que sa première construction en ligne aura réussi.
+
+## Notebooks pédagogiques
+
+Les trois expériences reproductibles de S14 se trouvent dans
+[`notebooks/`](notebooks/README.md). Après installation de leurs dépendances,
+chaque notebook peut être exécuté avec **Kernel → Restart & Run All** :
+
+```bash
+python -m pip install -r notebooks/requirements.txt
+jupyter notebook
+```
 
 ## Tests
 

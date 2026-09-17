@@ -1,0 +1,4 @@
+jupyter>=1.0
+nbconvert>=7.0
+ipykernel>=6.0
+matplotlib>=3.8
