@@ -1,0 +1,20 @@
+field,value
+software_name,MauriPay-Analytics
+current_code_version,0.2.0
+repository,https://github.com/mauripay-analytics-teams/mauripay-analytics
+permanent_archive_doi,"Not yet available; to be completed after the final tagged release and archival deposit."
+legal_code_licence,MIT via the repository-wide LICENSE file
+versioning_system,Git and GitHub
+languages,Python and TypeScript
+compilation_requirements,"setuptools >=68 and wheel for the backend; TypeScript and Vite with Node.js 18+ for the frontend"
+installation_requirements,"Python 3.10+, Node.js 18+, npm and Git; Docker optional"
+operating_environments,"Tested on Windows 10 64-bit; Linux deployment/documentation configured; Linux and macOS installation documented but not validated for the article"
+main_dependencies,"FastAPI, Pydantic, NumPy, Pandas, Polars, PyArrow, scikit-learn, PyTorch, React, Vite, Recharts, Plotly and Leaflet"
+documentation,"README; Sphinx/MyST documentation at https://mauripay-analytics.readthedocs.io/fr/latest/"
+testing,"pytest backend tests; Vitest/Testing Library frontend tests; no complete automated test CI"
+support,https://github.com/mauripay-analytics-teams/mauripay-analytics/issues
+citation_metadata,"CITATION.cff 1.2.0; DOI and release date pending"
+authors,"Seydna Aly Eby; Eby Cheikhna Sidiboubacar; Mohamedou Cheikh Tourad"
+affiliations,"a: Institut Supérieur de Comptabilité et d’Administration des Entreprises, Nouakchott, Mauritania; b: Université de Nouakchott — Faculté des Sciences et Techniques, Nouakchott, Mauritania"
+corresponding_author,"Mohamedou Cheikh Tourad; cheikhtouradmohamedou@gmail.com"
+reference_benchmark_environment,"Intel Core i3-6100U at 2.30 GHz; 7.88 GB RAM; CPU-only autoencoder; Python 3.12.3; Windows 10 64-bit"

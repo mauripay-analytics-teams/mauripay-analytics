@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "If you use MauriPay-Analytics, please cite this software."
+type: software
+title: MauriPay-Analytics
+version: 0.2.0
+authors:
+  - given-names: "Seydna Aly"
+    family-names: "Eby"
+    affiliation: "Institut Supérieur de Comptabilité et d’Administration des Entreprises, Nouakchott, Mauritania"
+  - given-names: "Eby Cheikhna"
+    family-names: "Sidiboubacar"
+    affiliation: "Institut Supérieur de Comptabilité et d’Administration des Entreprises, Nouakchott, Mauritania"
+  - given-names: "Mohamedou Cheikh"
+    family-names: "Tourad"
+    affiliation: "Institut Supérieur de Comptabilité et d’Administration des Entreprises, Nouakchott, Mauritania; Université de Nouakchott — Faculté des Sciences et Techniques, Nouakchott, Mauritania"
+    email: "cheikhtouradmohamedou@gmail.com"
+repository-code: "https://github.com/mauripay-analytics-teams/mauripay-analytics"
+license: MIT
