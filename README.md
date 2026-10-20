@@ -121,8 +121,8 @@ python -m sphinx -W --keep-going -b html docs docs/_build/html
 
 Ouvrez ensuite `docs/_build/html/index.html` dans un navigateur.
 
-La documentation Read the Docs sera ajoutée ici dès que le projet aura été
-importé et que sa première construction en ligne aura réussi.
+La documentation Read the Docs est disponible à l'adresse suivante :
+<https://mauripay-analytics.readthedocs.io/fr/latest/>.
 
 ## Notebooks pédagogiques
 
