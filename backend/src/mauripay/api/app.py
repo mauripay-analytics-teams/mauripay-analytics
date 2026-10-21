@@ -19,7 +19,6 @@ def create_app() -> FastAPI:
         title="MauriPay Analytics API",
         version="0.2.0",
         description="Backend API for MauriPay synthetic data and anomaly detection.",
-        openapi_version="3.1.0",
     )
     allowed_origins = [
         origin.strip()
