@@ -1,5 +1,6 @@
+
 import { Clock3 } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 
 type HeatmapRow = {
   day_of_week: string;
@@ -12,7 +13,16 @@ type HourlyHeatmapProps = {
   compact?: boolean;
 };
 
-const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+const DAYS = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+  "Sunday",
+];
+
 const DAY_LABELS: Record<string, string> = {
   Monday: "Lun",
   Tuesday: "Mar",
@@ -23,63 +33,144 @@ const DAY_LABELS: Record<string, string> = {
   Sunday: "Dim",
 };
 
-export function HourlyHeatmap({ rows, compact = false }: HourlyHeatmapProps) {
-  const max = Math.max(...rows.map((row) => row.transactions), 1);
+export function HourlyHeatmap({
+  rows,
+  compact = false,
+}: HourlyHeatmapProps) {
+  const reduceMotion = useReducedMotion();
+
+  const max = Math.max(
+    ...rows.map((row) => row.transactions),
+    1
+  );
+
   const valueBySlot = new Map(
-    rows.map((row) => [`${row.day_of_week}-${row.hour}`, row.transactions]),
+    rows.map((row) => [
+      `${row.day_of_week}-${row.hour}`,
+      row.transactions,
+    ])
   );
 
   return (
     <motion.section
-      className={`dashboard-card chart-card flex flex-col ${compact ? "min-h-[360px] lg:min-h-0" : ""}`}
-      initial={{ opacity: 0, y: 8 }}
+      aria-label="Heatmap horaire des transactions"
+      className={`
+        dashboard-card min-w-0
+        rounded-2xl border border-hairline
+        bg-surface p-5 shadow-card
+        transition-shadow duration-200
+        hover:shadow-card-hover
+        ${compact ? "self-start" : ""}
+      `}
+      initial={
+        reduceMotion
+          ? false
+          : { opacity: 0, y: 8 }
+      }
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.32, ease: "easeOut" }}
+      transition={{ duration: reduceMotion ? 0 : 0.3 }}
     >
-      <header className="mb-3 flex items-start gap-3">
+      <header className="mb-2 flex items-center gap-3">
         <span
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-anchor-weak text-anchor"
           aria-hidden="true"
+          className="
+            flex h-9 w-9 shrink-0
+            items-center justify-center
+            rounded-xl bg-anchor-weak text-anchor
+          "
         >
           <Clock3 className="h-[18px] w-[18px]" />
         </span>
+
         <div>
-          <h2 className="text-[13px] font-semibold text-ink">Heatmap horaire</h2>
-          <p className="mt-0.5 text-xs text-ink-muted">Activité par jour et par heure</p>
+          <h2 className="text-[13px] font-semibold text-ink">
+            Heatmap horaire
+          </h2>
+          <p className="mt-0.5 text-xs text-ink-muted">
+            Activité par jour et par heure
+          </p>
         </div>
       </header>
-      <div className="soft-scrollbar min-h-0 flex-1 overflow-x-auto">
+
+      <div className="soft-scrollbar -mt-3 overflow-x-auto pb-2">
         <div
-          className={`grid min-w-[760px] gap-1 ${compact ? "xl:min-w-0" : ""}`}
-          style={{ gridTemplateColumns: "40px repeat(24, minmax(14px, 1fr))" }}
+          className={`
+            grid gap-[4px]
+            ${compact
+              ? "min-w-[550px] xl:min-w-0"
+              : "min-w-[650px]"
+            }
+          `}
+          style={{
+            gridTemplateColumns:
+              "38px repeat(24, minmax(13px, 1fr))",
+          }}
         >
           <div />
+
           {Array.from({ length: 24 }, (_, hour) => (
-            <div className="tnum self-center text-center text-[10px] font-medium text-ink-faint" key={hour}>
+            <div
+              key={hour}
+              className="
+                tnum text-center text-[10px]
+                font-medium text-ink-faint
+              "
+            >
               {hour}
             </div>
           ))}
+
           {DAYS.map((day, dayIndex) => (
             <div className="contents" key={day}>
-              <div className="flex items-center text-[11px] font-medium text-ink-muted">
+              <div
+                className="
+                  flex items-center text-[11px]
+                  font-medium text-ink-muted
+                "
+              >
                 {DAY_LABELS[day]}
               </div>
+
               {Array.from({ length: 24 }, (_, hour) => {
-                const value = valueBySlot.get(`${day}-${hour}`) ?? 0;
-                const intensity = 0.06 + (value / max) * 0.9;
+                const value =
+                  valueBySlot.get(`${day}-${hour}`) ?? 0;
+
+                const intensity =
+                  0.07 + (value / max) * 0.88;
+
                 return (
                   <motion.div
-                    className="h-5 rounded-[3px] transition-shadow hover:ring-1 hover:ring-anchor/40"
-                    initial={{ opacity: 0 }}
+                    key={`${day}-${hour}`}
+                    role="img"
+                    aria-label={`${DAY_LABELS[day]}, ${hour} h : ${value.toLocaleString("fr-FR")} transactions`}
+                    tabIndex={0}
+                    className="
+                      h-[19px] rounded-[4px]
+                      cursor-default
+                      transition-transform duration-150
+                      hover:scale-110
+                      hover:ring-2 hover:ring-anchor/30
+                      focus-visible:outline
+                      focus-visible:outline-2
+                      focus-visible:outline-anchor
+                    "
+                    initial={
+                      reduceMotion
+                        ? false
+                        : { opacity: 0 }
+                    }
                     animate={{ opacity: 1 }}
                     transition={{
-                      delay: 0.05 + dayIndex * 0.03 + hour * 0.004,
-                      duration: 0.2,
-                      ease: "easeOut",
+                      delay: reduceMotion
+                        ? 0
+                        : 0.04 + dayIndex * 0.02,
+                      duration: reduceMotion ? 0 : 0.2,
                     }}
-                    key={`${day}-${hour}`}
-                    style={{ backgroundColor: `rgba(12, 92, 76, ${intensity})` }}
-                    title={`${DAY_LABELS[day]} ${hour}h — ${value.toLocaleString("fr-FR")} transactions`}
+                    style={{
+                      backgroundColor:
+                        `rgba(12, 92, 76, ${intensity})`,
+                    }}
+                    title={`${DAY_LABELS[day]} ${hour} h — ${value.toLocaleString("fr-FR")} transactions`}
                   />
                 );
               })}
@@ -87,12 +178,23 @@ export function HourlyHeatmap({ rows, compact = false }: HourlyHeatmapProps) {
           ))}
         </div>
       </div>
-      <div className="mt-3 flex items-center justify-end gap-2 text-[11px] font-medium text-ink-muted">
+
+      <div
+        className="
+          mt-2 flex items-center
+          justify-end gap-2
+          text-[11px] font-medium
+          text-ink-muted
+        "
+      >
         <span>Faible</span>
         <span
           aria-hidden="true"
-          className="h-2 w-16 rounded-full"
-          style={{ background: "linear-gradient(90deg, rgba(12,92,76,0.10), rgba(12,92,76,0.95))" }}
+          className="h-2 w-20 rounded-full"
+          style={{
+            background:
+              "linear-gradient(90deg, rgba(12,92,76,0.10), rgba(12,92,76,0.95))",
+          }}
         />
         <span>Fort</span>
       </div>

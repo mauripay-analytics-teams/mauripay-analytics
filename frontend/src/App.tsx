@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
-import { AlertTriangle, Banknote, CheckCircle2, ReceiptText } from "lucide-react";
-import { motion } from "framer-motion";
+import { AlertTriangle, Banknote, CheckCircle2, ReceiptText, LoaderCircle} from "lucide-react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
   apiClient,
   type ApiSnapshot,
@@ -28,6 +28,7 @@ function datasetFileName(path: string) {
 }
 
 export default function App() {
+  const reducedMotion = useReducedMotion();
   const [activeView, setActiveView] = useState<AppView>("dashboard");
   const [datasetPath, setDatasetPath] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -35,6 +36,7 @@ export default function App() {
   const [predictionResults, setPredictionResults] = useState<ModelPredictionResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [analysisSuccess, setAnalysisSuccess] = useState(false);
   const [apiReachable, setApiReachable] = useState<boolean | null>(null);
 
   const ensembleResult = useMemo(
@@ -47,6 +49,7 @@ export default function App() {
 
     setLoading(true);
     setError(null);
+    setAnalysisSuccess(false);
     try {
       const ingestion = await apiClient.uploadDataset(selectedFile);
       if (ingestion.invalid_rows > 0) {
@@ -68,9 +71,11 @@ export default function App() {
       setDatasetPath(dashboardResult.output_path);
       setSnapshot(await apiClient.getSnapshot(dashboardResult.output_path));
       setApiReachable(true);
+      setAnalysisSuccess(true);
     } catch (apiError) {
       setApiReachable(false);
       setError(apiError instanceof Error ? apiError.message : "Erreur API inconnue");
+      setAnalysisSuccess(false);
     } finally {
       setLoading(false);
     }
@@ -148,12 +153,54 @@ export default function App() {
       refreshing={loading}
     >
       <main className="mx-auto flex w-full min-w-0 flex-col gap-6 px-4 py-6 md:px-6">
-        {error ? (
-          <div className="rounded-lg border border-alert/25 bg-alert-weak px-4 py-3 text-sm font-medium text-alert">
-            {error}
-          </div>
-        ) : null}
+        
+{activeView === "dashboard" && loading && (
+  <div
+    role="status"
+    aria-live="polite"
+    className="flex items-center gap-3 rounded-xl border border-anchor/20 bg-anchor-weak px-4 py-3 text-sm text-anchor"
+  >
+    <LoaderCircle className="h-5 w-5 shrink-0 animate-spin" />
+    <span>
+      Analyse en cours... Veuillez patienter pendant
+      le traitement des transactions.
+    </span>
+  </div>
+)}
 
+{activeView === "dashboard" && analysisSuccess && !loading && !error && (
+  <div
+    role="status"
+    className="flex items-center gap-3 rounded-xl border border-anchor/20 bg-anchor-weak px-4 py-3 text-sm text-anchor"
+  >
+    <CheckCircle2 className="h-5 w-5 shrink-0" />
+    <span>
+      Analyse terminée avec succès.
+      Les résultats sont disponibles.
+    </span>
+  </div>
+)}
+
+        
+{error && (
+  <div
+    role="alert"
+    className="flex items-start gap-3 rounded-xl border border-alert/25 bg-alert-weak px-4 py-3 text-sm text-alert"
+  >
+    <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0" />
+
+    <div className="min-w-0">
+      <p className="font-semibold">
+        Une erreur est survenue
+      </p>
+      <p className="mt-1 break-words">
+        {error}
+      </p>
+    </div>
+  </div>
+)}
+
+    <AnimatePresence mode="wait" initial={false}>
         <motion.div
           key={activeView}
           className="flex flex-col gap-6"
@@ -182,7 +229,7 @@ export default function App() {
           <StatCard
             detail="Volume total du dataset chargé"
             icon={ReceiptText}
-            status="Dataset chargé"
+            status={snapshot ? "Dataset chargé" : "En attente"}
             title="Transactions"
             value={formatNumber(snapshot?.stats.total_transactions ?? 0)}
           />
@@ -190,7 +237,7 @@ export default function App() {
             detail="Somme des montants observés"
             icon={Banknote}
             nowrapValue
-            status="Analyse terminée"
+            status={snapshot ? "Analyse terminée" : "En attente"}
             title="Montant total"
             value={formatAmount(snapshot?.stats.total_amount ?? 0)}
           />
@@ -201,7 +248,7 @@ export default function App() {
                 : "Chargez un fichier pour lancer l'analyse"
             }
             icon={AlertTriangle}
-            status="Consensus des 3 modèles"
+            status={ensembleResult ? "Consensus des 3 modèles" : "En attente"}
             title="Fraudes détectées"
             tone="alert"
             value={
@@ -213,7 +260,7 @@ export default function App() {
           <StatCard
             detail="Part des transactions échouées"
             icon={CheckCircle2}
-            status="Échecs"
+            status={snapshot ? "Échecs" : "En attente"}
             title="Taux d'échec"
             value={formatPercent(snapshot?.stats.failure_rate ?? 0)}
           />
@@ -222,6 +269,7 @@ export default function App() {
 
             {activeView !== "dashboard" ? renderActivePage() : null}
         </motion.div>
+        </AnimatePresence>
       </main>
     </AppLayout>
   );

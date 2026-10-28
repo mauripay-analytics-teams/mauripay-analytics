@@ -31,7 +31,7 @@ function parseDisplayValue(value: string) {
     return null;
   }
 
-  const match = value.match(/[\d\s .,]+/);
+  const match = value.match(/\d[\d\s\u00a0\u202f.,]*/);
   if (!match) return null;
 
   const rawNumber = match[0];
@@ -100,42 +100,100 @@ export function StatCard({
   nowrapValue = false,
 }: StatCardProps) {
   const colors = toneClasses[tone];
+  const reduceMotion = useReducedMotion();
 
-  return (
-    <motion.section
-      className="relative flex min-h-[132px] flex-col overflow-hidden rounded-xl border border-hairline bg-surface p-4 shadow-card transition-[box-shadow,border-color,transform] duration-150 hover:-translate-y-px hover:border-anchor/30 hover:shadow-card-hover"
-      variants={{
-        hidden: { opacity: 0, y: 10 },
-        visible: { opacity: 1, y: 0 },
-      }}
-      transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
-    >
-      <span aria-hidden="true" className={`absolute inset-x-0 top-0 h-0.5 ${colors.topRule}`} />
-
-      <div className="flex items-start justify-between gap-3">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.06em] text-ink-muted">{title}</p>
-        <span
-          className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${colors.icon}`}
-          aria-hidden="true"
-        >
-          <Icon className="h-4 w-4" />
-        </span>
-      </div>
-
-      <p
-        className={`tnum mt-2 text-[1.75rem] font-semibold leading-8 ${colors.value} ${
-          nowrapValue ? "truncate" : ""
-        }`}
-      >
-        <CountUpValue value={value} />
+  
+return (
+  <motion.section
+    className="
+      group relative flex min-h-[155px] min-w-0
+      flex-col overflow-hidden rounded-2xl
+      border border-hairline bg-surface p-5
+      shadow-card transition-all duration-200
+      hover:border-anchor/20
+      hover:shadow-card-hover
+    "
+    
+whileHover={
+  reduceMotion
+    ? undefined
+    : {
+        y: -3,
+        transition: {
+          duration: 0.18,
+          ease: "easeOut",
+        },
+      }
+}
+    variants={{
+      hidden: { opacity: 0, y: 10 },
+      visible: { opacity: 1, y: 0 },
+    }}
+    transition={{
+      duration: 0.32,
+      ease: [0.22, 1, 0.36, 1],
+    }}
+  >
+    {/* En-tête */}
+    <div className="flex items-start justify-between gap-3">
+      <p className="
+        min-w-0 text-[11px] font-semibold
+        uppercase tracking-[0.08em] text-ink-muted
+      ">
+        {title}
       </p>
 
-      <div className="mt-auto flex items-end justify-between gap-2 pt-3">
-        <p className="min-w-0 text-xs font-medium leading-4 text-ink-muted">{detail}</p>
-        <span className="shrink-0 rounded-full border border-hairline px-2 py-0.5 text-[10px] font-medium text-ink-muted">
-          {status}
+      <span
+        aria-hidden="true"
+        className={`
+          flex h-10 w-10 shrink-0 items-center
+          justify-center rounded-xl
+transition-transform duration-200
+group-hover:scale-105 ${colors.icon}
+        `}
+      >
+        <Icon className="h-5 w-5" />
+      </span>
+    </div>
+
+    {/* Valeur statistique */}
+    <p
+      className={`
+        tnum mt-3 text-[clamp(1.4rem,2vw,2rem)]
+        font-bold leading-tight tracking-tight
+        ${colors.value}
+        ${nowrapValue ? "truncate" : "break-words"}
+      `}
+    >
+      <CountUpValue value={value} />
+    </p>
+
+    {/* Description et badge */}
+    <div className="mt-auto min-w-0 pt-5">
+      <p className="
+        text-xs leading-relaxed text-ink-muted
+      ">
+        {detail}
+      </p>
+
+      <div className="mt-3 flex flex-wrap">
+        <span
+          className={`
+            inline-flex max-w-full items-center
+            rounded-full px-2.5 py-1
+            text-[10px] font-semibold
+            ${tone === "alert"
+              ? "bg-alert-weak text-alert"
+              : "bg-anchor-weak text-anchor"
+            }
+          `}
+        >
+          <span className="break-words">
+            {status}
+          </span>
         </span>
       </div>
-    </motion.section>
-  );
+    </div>
+  </motion.section>
+);
 }

@@ -15,29 +15,39 @@ export default {
   content: ["./index.html", "./src/**/*.{ts,tsx}", "./tests/**/*.{ts,tsx}"],
   theme: {
     extend: {
-      colors: {
-        canvas: "#F5F7F6",
-        surface: "#FFFFFF",
-        hairline: "#E4E7E5",
-        ink: {
-          DEFAULT: "#16211D",
-          muted: "#5C6B65",
-          faint: "#8A9A93",
-        },
-        anchor: {
-          DEFAULT: "#0C5C4C",
-          strong: "#0A4A3D",
-          weak: "#EAF1EE",
-        },
-        accent: {
-          DEFAULT: "#A67C3D",
-          ink: "#7A5A28",
-        },
-        alert: {
-          DEFAULT: "#B42318",
-          weak: "#FBEAE8",
-        },
-      },
+      
+
+
+colors: {
+  canvas: "rgb(var(--canvas-rgb) / <alpha-value>)",
+  surface: "rgb(var(--surface-rgb) / <alpha-value>)",
+  hairline: "rgb(var(--hairline-rgb) / <alpha-value>)",
+
+  ink: {
+    DEFAULT: "rgb(var(--ink-rgb) / <alpha-value>)",
+    muted: "rgb(var(--ink-muted-rgb) / <alpha-value>)",
+    faint: "rgb(var(--ink-faint-rgb) / <alpha-value>)",
+  },
+
+  anchor: {
+    DEFAULT: "rgb(var(--anchor-rgb) / <alpha-value>)",
+    strong: "rgb(var(--anchor-strong-rgb) / <alpha-value>)",
+    weak: "rgb(var(--anchor-weak-rgb) / <alpha-value>)",
+  },
+
+  accent: {
+    DEFAULT: "rgb(var(--accent-rgb) / <alpha-value>)",
+    ink: "rgb(var(--accent-ink-rgb) / <alpha-value>)",
+  },
+
+  alert: {
+    DEFAULT: "rgb(var(--alert-rgb) / <alpha-value>)",
+    weak: "rgb(var(--alert-weak-rgb) / <alpha-value>)",
+  },
+},
+
+
+
       fontFamily: {
         sans: ['"IBM Plex Sans"', '"Segoe UI"', "system-ui", "-apple-system", "sans-serif"],
         mono: ['"IBM Plex Mono"', "ui-monospace", "SFMono-Regular", "Menlo", "monospace"],
