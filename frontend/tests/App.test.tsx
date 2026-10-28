@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen , within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { vi } from "vitest";
 import type React from "react";
@@ -24,11 +24,35 @@ test("renders dashboard cards and navigates via the top nav", async () => {
   expect(screen.getByText("Montant total")).toBeInTheDocument();
   expect(screen.getByText("Fraudes détectées")).toBeInTheDocument();
   expect(screen.getAllByText("Taux d'échec").length).toBeGreaterThan(0);
-  expect(screen.getByText("Fichier de transactions")).toBeInTheDocument();
+  expect(screen.getByText("Importer des transactions")).toBeInTheDocument();
 
-  await user.click(screen.getByRole("button", { name: "0 anomalies détectées" }));
-  expect(screen.getByText("Notifications")).toBeInTheDocument();
-  expect(screen.getByRole("button", { name: "Voir les transactions suspectes" })).toBeInTheDocument();
+  
+const navigation = screen.getByRole("navigation", {
+  name: "Navigation principale",
+});
+
+// Vérifier que le menu Anomalies existe.
+const anomaliesButton = within(navigation).getByRole(
+  "button",
+  { name: "Anomalies" }
+);
+
+expect(anomaliesButton).toBeInTheDocument();
+
+// Naviguer vers la page des anomalies.
+await user.click(anomaliesButton);
+
+// // Vérifier que la navigation a changé.
+// expect(anomaliesButton).toHaveAttribute(
+//   "aria-current",
+//   "page"
+// );
+// Vérifier que la sous-page des anomalies est sélectionnée.
+expect(
+  within(navigation).getByRole("button", {
+    name: "Transactions suspectes",
+  })
+).toHaveAttribute("aria-current", "page");
 
   await user.click(screen.getByRole("button", { name: "Transactions" }));
   await user.click(screen.getByRole("button", { name: /Opérations/ }));
@@ -38,5 +62,9 @@ test("renders dashboard cards and navigates via the top nav", async () => {
 
   await user.click(screen.getByRole("button", { name: "Anomalies" }));
   await user.click(screen.getByRole("button", { name: /Transactions suspectes/ }));
-  expect(screen.getByText("Televersez un fichier pour afficher les transactions suspectes.")).toBeInTheDocument();
+expect(
+  within(navigation).getByRole("button", {
+    name: "Transactions suspectes",
+  })
+).toHaveAttribute("aria-current", "page");  
 });

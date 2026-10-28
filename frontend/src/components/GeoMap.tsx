@@ -36,9 +36,7 @@ export function GeoMap({ wilayas, compact = false }: GeoMapProps) {
 
   return (
     <section
-      className={`dashboard-card overflow-hidden ${
-        compact ? "geo-map-compact flex min-h-[380px] flex-col lg:min-h-0" : ""
-      }`}
+      className="dashboard-card geo-map-compact flex min-w-0 flex-col overflow-hidden"
     >
       <header
         className={`flex shrink-0 items-start gap-3 border-b border-hairline ${
@@ -61,15 +59,19 @@ export function GeoMap({ wilayas, compact = false }: GeoMapProps) {
         </div>
       </header>
       <MapContainer
-        center={[18.2, -12.6]}
-        className={compact ? "flex-1" : undefined}
-        zoom={5}
-        scrollWheelZoom={false}
-      >
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
-          url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
-        />
+  center={[20.0, -11.5]}
+  className="h-[300px] w-full"
+  style={{ height: 300, width: "100%" }}
+  zoom={5}
+  scrollWheelZoom={false}
+>
+        
+<TileLayer
+  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+  maxZoom={18}
+/>
+
         {wilayas.map((item) => {
           const position = WILAYA_COORDINATES[item.wilaya];
           if (!position) return null;
@@ -88,7 +90,7 @@ export function GeoMap({ wilayas, compact = false }: GeoMapProps) {
                 opacity: 0.9,
                 weight: 2,
               }}
-              radius={6 + (item.transactions / maxTransactions) * 20}
+              radius={5 + (item.transactions / maxTransactions) * 12}
             >
               <Tooltip direction="top" opacity={1}>
                 <div className="text-xs">

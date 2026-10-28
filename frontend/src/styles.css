@@ -6,16 +6,31 @@
    MauriPay Analytics — base layer
    Tokens mirror tailwind.config.ts. Five hues, one elevation, hairline rules.
 --------------------------------------------------------------------------- */
+
+
 :root {
-  --canvas: #f5f7f6;
+  color-scheme: light;
+
+  --canvas: #f8fafc;
   --surface: #ffffff;
-  --hairline: #e4e7e5;
-  --ink: #16211d;
-  --ink-muted: #5c6b65;
-  --anchor: #0c5c4c;
-  --anchor-weak: #eaf1ee;
-  --alert: #b42318;
+  --hairline: #e2e8f0;
+
+  --ink: #0f172a;
+  --ink-muted: #64748b;
+  --ink-faint: #94a3b8;
+
+  --anchor: #065f46;
+  --anchor-strong: #064e3b;
+  --anchor-weak: #d1fae5;
+
+  --accent: #10b981;
+  --accent-ink: #047857;
+
+  --alert: #dc2626;
+  --alert-weak: #fee2e2;
 }
+
+
 
 html {
   color: var(--ink);
@@ -191,4 +206,67 @@ body {
     transition-duration: 1ms !important;
     scroll-behavior: auto !important;
   }
+  
 }
+/* Ajouter à la fin de frontend/src/styles.css */
+:root {
+  --canvas-rgb: 248 250 252;
+  --surface-rgb: 255 255 255;
+  --hairline-rgb: 226 232 240;
+  --ink-rgb: 15 23 42;
+  --ink-muted-rgb: 100 116 139;
+  --ink-faint-rgb: 148 163 184;
+  --anchor-rgb: 6 95 70;
+  --anchor-strong-rgb: 6 78 59;
+  --anchor-weak-rgb: 209 250 229;
+  --accent-rgb: 16 185 129;
+  --accent-ink-rgb: 4 120 87;
+  --alert-rgb: 220 38 38;
+  --alert-weak-rgb: 254 226 226;
+  --ink-faint: #94a3b8;
+  --anchor-strong: #064e3b;
+  --accent: #10b981;
+  --accent-ink: #047857;
+  --alert-weak: #fee2e2;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --canvas-rgb: 11 18 32;
+  --surface-rgb: 17 28 46;
+  --hairline-rgb: 42 57 77;
+  --ink-rgb: 241 245 249;
+  --ink-muted-rgb: 165 180 199;
+  --ink-faint-rgb: 132 148 170;
+  --anchor-rgb: 52 211 153;
+  --anchor-strong-rgb: 5 150 105;
+  --anchor-weak-rgb: 22 63 55;
+  --accent-rgb: 110 231 183;
+  --accent-ink-rgb: 167 243 208;
+  --alert-rgb: 248 113 113;
+  --alert-weak-rgb: 75 37 45;
+
+  --canvas: #0b1220;
+  --surface: #111c2e;
+  --hairline: #2a394d;
+  --ink: #f1f5f9;
+  --ink-muted: #a5b4c7;
+  --ink-faint: #8494aa;
+  --anchor: #34d399;
+  --anchor-strong: #059669;
+  --anchor-weak: #163f37;
+  --accent: #6ee7b7;
+  --accent-ink: #a7f3d0;
+  --alert: #f87171;
+  --alert-weak: #4b252d;
+}
+
+:root[data-theme="dark"] .recharts-cartesian-grid line { stroke: #2a394d; }
+:root[data-theme="dark"] .leaflet-container { background: #1d2939; }
+:root[data-theme="dark"] .leaflet-popup-content-wrapper,
+:root[data-theme="dark"] .leaflet-tooltip {
+  background: var(--surface);
+  color: var(--ink);
+}
+:root[data-theme="dark"] .dashboard-card { box-shadow: 0 1px 5px rgba(0,0,0,.22); }
+:root[data-theme="dark"] .dashboard-card:hover { box-shadow: 0 8px 24px rgba(0,0,0,.26); }
