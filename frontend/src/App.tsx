@@ -249,7 +249,7 @@ export default function App() {
             }
             icon={AlertTriangle}
             status={ensembleResult ? "Consensus des 3 modèles" : "En attente"}
-            title="Fraudes détectées"
+            title="Alertes détectées"
             tone="alert"
             value={
               ensembleResult
