@@ -22,7 +22,7 @@ test("renders dashboard cards and navigates via the top nav", async () => {
   expect(screen.getByText(/MauriPay/)).toBeInTheDocument();
   expect(screen.getAllByText("Transactions").length).toBeGreaterThan(0);
   expect(screen.getByText("Montant total")).toBeInTheDocument();
-  expect(screen.getByText("Fraudes détectées")).toBeInTheDocument();
+  expect(screen.getByText("Alertes détectées")).toBeInTheDocument();
   expect(screen.getAllByText("Taux d'échec").length).toBeGreaterThan(0);
   expect(screen.getByText("Importer des transactions")).toBeInTheDocument();
 
@@ -55,7 +55,7 @@ expect(
 ).toHaveAttribute("aria-current", "page");
 
   await user.click(screen.getByRole("button", { name: "Transactions" }));
-  await user.click(screen.getByRole("button", { name: /Opérations/ }));
+  await user.click(screen.getByRole("button", { name: /^Analyse des opérations$/i }));
   expect(screen.getByText("Heatmap horaire")).toBeInTheDocument();
   expect(screen.queryByText("Fichier de transactions")).not.toBeInTheDocument();
   expect(screen.queryByText("Montant total")).not.toBeInTheDocument();

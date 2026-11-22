@@ -7,7 +7,7 @@ name = "mauripay-analytics-backend"
 version = "0.2.0"
 description = "Backend Python pour l'analyse de transactions Mobile Money MauriPay."
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 authors = [
     { name = "MauriPay Analytics Team" },
 ]

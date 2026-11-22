@@ -1,21 +1,25 @@
 # Figures de l'article
 
-Ce dossier contient les figures finales dérivées des résultats S14 :
+Ce dossier conserve les figures dérivées des artefacts S14. Quatre sont
+incluses dans le manuscrit ; la figure de temps reste un artefact historique.
 
-| Fichier attendu | Contenu | Source |
-|---|---|---|
-| `architecture.png` | Architecture en cinq couches et pipeline | Architecture du projet |
-| `benchmark_models.png` | Precision, recall, F1-score et ROC-AUC | Notebook 2 |
-| `benchmark_time.png` | Temps d'entraînement et de prédiction | Notebook 2 |
-| `anomaly_distribution.png` | Répartition des anomalies injectées | Notebook 1 |
-| `geographic_analysis.png` | Transactions et anomalies par wilaya | Notebook 3 |
+| Fichier | Contenu | Source lue par le script | Usage dans le manuscrit |
+|---|---|---|---|
+| `architecture.png` | Architecture en cinq couches et pipeline | Description de l'architecture dans le script | Figure 1 |
+| `anomaly_distribution.png` | Répartition des anomalies injectées | Parquet 100K du notebook 01 | Figure 2 |
+| `benchmark_models.png` | Precision, recall, F1-score et ROC-AUC | `paper/tables/model_results.csv` | Figure 3 |
+| `geographic_analysis.png` | Transactions et anomalies par wilaya | Parquet 100K ; agrégation des rôles expéditeur et destinataire | Figure 4 |
+| `benchmark_time.png` | Temps historiques d'entraînement et de prédiction | `paper/tables/model_results.csv` | Exclu ; fichier conservé |
 
-Les images sont régénérées sans capture d'écran par :
+Commande historique de génération, non exécutée lors de cette correction :
 
 ```powershell
 python paper/generate_figures.py
 ```
 
-Le script lit le dataset reproductible de S14 et le tableau figé du benchmark,
-puis exporte cinq fichiers PNG à 300 dpi. Toute modification des résultats doit
-être suivie d'une nouvelle exécution du script et d'une vérification visuelle.
+Le script lit le dataset et le CSV de l'article, puis exporte cinq fichiers
+PNG. Il produit encore `benchmark_time.png` ; cela ne réintègre pas cette
+figure dans le manuscrit et n'authentifie pas ses mesures. Le script et toutes
+les images sont conservés sans modification pendant cette phase éditoriale.
+Les temps sont exclus de la comparaison principale faute de provenance
+d'exécution suffisamment documentée ; voir `../results_provenance.md`.

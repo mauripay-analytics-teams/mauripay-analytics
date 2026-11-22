@@ -4,6 +4,16 @@ Les benchmarks comparent Isolation Forest, LOF et l’autoencoder sur les
 datasets synthétiques. Les sources de référence sont
 `benchmarks/results_full.md` et les fichiers JSON de `benchmarks/results/`.
 
+Ces fichiers décrivent les benchmarks historiques sur dataset entier, pas le
+benchmark chronologique du manuscrit. Celui-ci est défini dans le notebook 02
+et documenté dans `backend/notebooks/README.md` : 8 000 lignes d'entraînement,
+2 000 d'évaluation, dont 139 anomalies ; autoencoder à 10 époques sur CPU.
+Le runner « full » entraîne IF/LOF sur toutes les lignes et l'autoencoder sur
+les lignes normales, puis évalue tous les modèles sur le dataset entier.
+Son défaut autoencoder est de 50 époques. Il ne reproduit donc pas la Table 1
+du manuscrit. Les commandes ci-dessous sont documentées, pas exécutées lors
+de la finalisation scientifique.
+
 ## Environnement enregistré
 
 | Propriété | Valeur |
@@ -56,9 +66,25 @@ python benchmarks/run_benchmark.py \
   --threshold-percentile 98
 ```
 
-## MauriPay-M — 100 000 lignes
+## MauriPay-M 100K — benchmark historique de 100 000 lignes
 
 Dataset : `data/generated/mauripay_m_100k.csv`.
+
+Le JSON historique enregistre 6 548 anomalies. Le notebook 01 utilise un autre
+fichier, `data/generated/mauripay_m_notebook_100k.parquet`, dont les sorties
+sauvegardées enregistrent 7 691 anomalies. Leurs effectifs ne sont pas
+interchangeables. Le JSON ne fournit ni empreinte du dataset, ni commit du
+générateur, ni tous les paramètres de génération. La cause exacte de cette
+différence reste **NON VÉRIFIÉE** ; une nouvelle exécution du code actuel ne
+doit pas être présentée comme la reproduction démontrée de l'ancien fichier.
+
+La lecture seule du CSV local actuel donne **7 691**, et non 6 548 anomalies.
+Le chemin seul ne permet donc pas d'identifier l'entrée historique. De même,
+le CSV 10K local actuel contient **543** anomalies, alors que son JSON en
+enregistre **680**. Les tableaux de cette page restent les résultats des
+anciens rapports et ne sont pas recalculés sur les fichiers actuels. Les
+empreintes des fichiers présents figurent dans `paper/results_provenance.md` ;
+elles n'authentifient pas les entrées des exécutions historiques.
 
 | Mesure | Valeur |
 |---|---:|
