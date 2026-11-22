@@ -54,7 +54,7 @@ test("anomalies view displays the suspicious transactions table", () => {
   render(<AnomaliesView results={results} />);
 
   expect(screen.getByText("Filtres")).toBeInTheDocument();
-  expect(screen.queryByText("Transactions suspectes")).not.toBeInTheDocument();
+  expect(screen.getByRole("heading", { name: "Transactions suspectes" })).toBeInTheDocument();
   expect(screen.getByText("TX-IF")).toBeInTheDocument();
   expect(screen.getByText("TX-LOF")).toBeInTheDocument();
   expect(screen.getAllByText("High amount").length).toBeGreaterThan(0);

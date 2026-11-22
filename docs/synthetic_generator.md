@@ -4,6 +4,11 @@ Le générateur crée des transactions Mobile Money fictives conformes au
 {doc}`data_schema`. Il simule le contexte mauritanien, des comportements
 normaux et plusieurs familles d’anomalies.
 
+Le logiciel s'appelle **MauriPay-Analytics** ; le composant est le **synthetic
+transaction generator**, module `mauripay.synthetic`. **MauriPay-M 100K** est
+le nom du scénario de 100 000 transactions, aux côtés de MauriPay-S 10K et
+MauriPay-L 1M dans `benchmarks/full_10k_benchmark.py`.
+
 ## Générer un dataset
 
 Depuis le dossier `backend/`, sous Windows PowerShell :
@@ -53,8 +58,15 @@ Une valeur comme `0.02` correspond à une probabilité de 2 %. Le taux final de
 lignes anormales peut être supérieur, car un seul événement de structuration
 ou de forte fréquence génère plusieurs transactions.
 
-La même commande avec une seed et des paramètres identiques produit des
-résultats reproductibles avec la même version du code et des dépendances.
+La graine fixe le tirage pseudo-aléatoire du générateur (`random.seed`). Les
+identifiants de transaction utilisent toutefois `uuid.uuid4()` dans le schéma
+Pydantic et ne sont pas contrôlés par cette graine. Des paramètres identiques
+ne garantissent donc pas des fichiers identiques octet par octet. La version
+du code, les dépendances et le fichier effectivement chargé doivent aussi être
+identifiés. Les notebooks rechargent un dataset existant sans le régénérer.
+
+Les commandes exactes pour les jeux des notebooks, leurs chemins et les
+limites de provenance sont décrits dans `backend/notebooks/README.md`.
 
 ## Patterns normaux
 

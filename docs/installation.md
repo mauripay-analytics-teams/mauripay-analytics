@@ -5,7 +5,7 @@ le frontend, les tests et la documentation de MauriPay-Analytics.
 
 ## Prérequis
 
-- Python 3.10 ou supérieur ;
+- Python 3.11 ou supérieur ;
 - Node.js 18 ou supérieur ;
 - npm ;
 - Git.

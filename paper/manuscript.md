@@ -1,6 +1,6 @@
 # MauriPay-Analytics: Open-Source Mobile Money Analytics and Anomaly Detection
 
-**Seydna Aly Eby**^a^, **Eby Cheikhna Sidiboubacar**^a^, **Mohamedou Cheikh Tourad**^a,b^
+**Mohamedou Cheikh Tourad**^a,b^, **Seydna Aly Eby**^a^, **Eby Cheikhna Sidiboubacar**^a^
 
 ^a^ Institut Supérieur de Comptabilité et d’Administration des Entreprises, Nouakchott, Mauritania  
 ^b^ Université de Nouakchott — Faculté des Sciences et Techniques, Nouakchott, Mauritania
@@ -20,7 +20,7 @@ transactions, with particular attention to Mauritanian and West African usage
 patterns. The software follows a five-layer architecture covering data,
 ingestion and feature engineering, anomaly detection, a FastAPI application
 programming interface, and user interfaces including a React dashboard. Its
-synthetic generator, MauriPay-M, models transaction channels, wilayas,
+synthetic transaction generator models transaction channels, wilayas,
 operators, Ramadan activity, bill payments, diaspora transfers, and tontines,
 and injects five configurable anomaly families. The detection pipeline combines
 Isolation Forest, Local Outlier Factor, and a neural autoencoder with
@@ -96,7 +96,7 @@ as part of the complete `generate → ingest → detect → visualize` workflow.
 The corresponding source modules are `mauripay/synthetic/`,
 `mauripay/ingestion/`, `mauripay/features/`, `mauripay/detection/`, and
 `mauripay/api/` under `backend/src/`. The `frontend/` directory contains the
-dashboard, `notebooks/` contains the reproducible experiments, and `docs/`
+dashboard, `backend/notebooks/` contains the reproducible experiments, and `docs/`
 contains the Sphinx and MyST technical documentation.
 
 ![MauriPay-Analytics five-layer architecture.](figures/architecture.png)
@@ -122,9 +122,13 @@ loaded from CSV, JSON, JSONL, or Parquet files.
 
 ### 2.3 Synthetic transaction generator
 
-MauriPay-M generates configurable synthetic transaction datasets without using
-real customer records. A fixed pseudo-random seed makes an experiment
-repeatable; the illustrative notebooks use `seed=42`. The generator produces
+The synthetic transaction generator (`mauripay.synthetic`) creates configurable
+datasets without using real customer records. MauriPay-Analytics is the software
+name; MauriPay-M 100K denotes its 100,000-row scenario, as defined in
+`benchmarks/full_10k_benchmark.py`, rather than a separate generator.
+The illustrative notebooks use `seed=42`. This seed controls pseudo-random
+sampling, but transaction identifiers use unseeded UUID4 values; byte-identical
+dataset regeneration is therefore not guaranteed. The generator produces
 non-uniform channel, operator, transaction-type, amount, temporal, and
 geographic distributions. It includes contextual normal patterns such as
 Ramadan activity, salary periods, bill payments, diaspora transfers, and
@@ -195,13 +199,15 @@ which keeps programmatic and visual results consistent.
 
 ### 3.1 Dataset generation and exploration
 
-The first notebook generated a MauriPay-M dataset of 100,000 transactions with
+The first notebook generated a MauriPay-M 100K dataset of 100,000 transactions with
 the fixed seed 42. The timestamps cover 1 January to 31 March 2026. The dataset
-contains 18 fields and a total simulated value of MRU 3.154 billion. The mean
-transaction amount was MRU 31,544.79, while the median was MRU 18,003.76. The
-marked difference between the mean and median, together with a maximum of MRU
-2.642 million, illustrates the right-skewed amount distribution and motivates
-the logarithmic amount transformation used in feature engineering.
+contains 18 fields. Historical summaries report a raw numerical sum of 3.154
+billion, a mean of 31,544.79, a median of 18,003.76, and a maximum of 2.642
+million for the `amount` column. These summaries pool MRU, XOF, and USD without
+currency conversion. They therefore have no single monetary unit and cannot
+be interpreted as MRU totals or as economically comparable monetary statistics.
+The numbers are retained as historical computational outputs, not converted
+values; no exchange rates or recalculated results are introduced here.
 
 USSD accounted for 71,704 transactions (71.70%), mobile applications for
 23,082 (23.08%), and agents for 5,214 (5.21%). The generator therefore produces
@@ -214,11 +220,21 @@ roles and consequently sum to twice the number of transactions.
 The dataset includes 55,343 Ramadan transactions and 44,657 transactions
 outside Ramadan. The normalised hourly profiles allow differences in the timing
 of activity to be compared without confusing them with the unequal group
-sizes. MauriPay-M labelled 7,691 rows as anomalous, corresponding to 7.69% of
+sizes. The generator labelled 7,691 rows as anomalous, corresponding to 7.69% of
 the dataset: 4,040 high-frequency rows, 1,780 structuring rows, 960 high-amount
 rows, 534 operator-outage rows, and 377 unusual-location rows. This final rate
 is higher than the 2% isolated-anomaly parameter because the structuring and
 high-frequency generators create multi-transaction sequences.
+
+These counts are recorded in the saved outputs of notebook 01 for
+`data/generated/mauripay_m_notebook_100k.parquet`. The historical full-dataset
+benchmark JSON instead records 6,548 anomalies under the path
+`data/generated/mauripay_m_100k.csv`. Inspection of the current local file at
+that path finds 7,691 anomalies, not 6,548. Thus its current content cannot
+authenticate the historical benchmark dataset. The notebook Parquet contains
+7,691 anomalies, with 92,222 MRU, 4,878 XOF, and 2,900 USD transactions.
+The exact cause of the historical discrepancy remains unverified; neither
+results nor current file fingerprints establish identity with the old input.
 
 The corresponding channel, amount, Ramadan, and anomaly-distribution figures
 are generated by `01_generation_et_exploration.ipynb` and are intended for
@@ -238,38 +254,41 @@ Outlier Factor [@breunig2000lof], and an autoencoder
 the first 8,000 formed the training set and the final 2,000 formed an independent
 temporal evaluation set containing 139 labelled anomalies. Preprocessors were
 fitted only on training data. The autoencoder preprocessor and detector were
-trained on the normal training subset. Table 1 reports the reference execution
-on CPU.
+trained on the normal training subset. Table 1 reports detection metrics that
+agree with the saved notebook results to the reported precision.
 
 **Table 1. Detection results on the temporal evaluation set.**
 
-| Model | Precision | Recall | F1-score | ROC-AUC | Training (s) | Inference (s) | Alerts |
-|---|---:|---:|---:|---:|---:|---:|---:|
-| Isolation Forest | 1.0000 | 0.1799 | 0.3049 | 0.9448 | 0.5597 | 0.0387 | 25 |
-| LOF | 0.3659 | 0.1079 | 0.1667 | 0.4512 | 6.2258 | 0.4077 | 41 |
-| Autoencoder | 0.8271 | 0.7914 | 0.8088 | 0.9382 | 13.0461 | 0.0140 | 133 |
+| Model | Precision | Recall | F1-score | Accuracy | ROC-AUC | Alerts |
+|---|---:|---:|---:|---:|---:|---:|
+| Isolation Forest | 1.0000 | 0.1799 | 0.3049 | 0.9430 | 0.9448 | 25 |
+| LOF | 0.3659 | 0.1079 | 0.1667 | 0.9250 | 0.4512 | 41 |
+| Autoencoder | 0.8271 | 0.7914 | 0.8088 | 0.9740 | 0.9382 | 133 |
+
+Historical training and prediction times are excluded from the main comparison
+because their execution provenance is insufficiently documented. The original
+measurements remain unchanged in the historical CSV/JSON files; discrepancies
+and provenance limitations are documented in
+[results_provenance.md](results_provenance.md).
 
 ![Comparison of detection metrics.](figures/benchmark_models.png)
 
 *Figure 3. Precision, recall, F1-score, and ROC-AUC on the temporal evaluation
 set.*
 
-![Comparison of model execution times.](figures/benchmark_time.png)
-
-*Figure 4. Training and inference times on the reference CPU environment.*
-
 Precision measures the proportion of alerts that correspond to injected
 anomalies, whereas recall measures the proportion of injected anomalies that
-were detected. The F1-score balances these two quantities. Training and
-inference times characterise computational cost, but remain dependent on the
-hardware and runtime environment.
+were detected. The F1-score balances these two quantities. Accuracy measures
+the proportion of correct predictions across all evaluation transactions.
+The main comparison assesses detection quality, without a comparative claim
+about execution time.
 
 Isolation Forest produced no false positives in this run but detected only 25
 of the 139 anomalies, giving high precision and low recall. LOF generated more
 false alerts while recovering fewer true anomalies, resulting in the lowest
 F1-score. The autoencoder recovered 110 anomalies with 23 false positives and
-therefore achieved the strongest precision--recall balance, at the cost of the
-longest training time. These observations do not establish universal model
+therefore achieved the strongest precision--recall balance. These observations
+do not establish universal model
 superiority: they apply to this synthetic dataset, temporal split,
 preprocessing pipeline, and hyperparameter configuration. Repeated runs across
 seeds and datasets are required to estimate variability and generalisation.
@@ -277,15 +296,26 @@ seeds and datasets are required to estimate variability and generalisation.
 The full protocol, hardware, and library versions are recorded in
 [experimental_environment.md](experimental_environment.md); the machine-readable
 results are in [tables/model_results.csv](tables/model_results.csv).
+Regeneration commands, artifact distinctions, UUID limitations, and notebook
+paths are documented in
+[the notebook reproduction guide](../backend/notebooks/README.md).
+The artifact inventory and current input SHA-256 fingerprints are recorded in
+[results_provenance.md](results_provenance.md). Git history identifies commits
+that first stored the artifacts, not demonstrated execution commits. The exact
+historical execution commits and complete run-specific dependency environments
+remain unverified; matching currently installed versions does not prove them.
 
 ### 3.3 Geographic analysis
 
 The third notebook reproduced the aggregation logic of the `/geo` API locally.
 Sender and receiver records were converted into geographic activity events and
 grouped by wilaya. For each wilaya, the analysis reports the number of roles,
-their combined transaction amount, number of anomalous roles, failure rate,
+their raw combined `amount` values, number of anomalous roles, failure rate,
 and anomaly rate. Nouakchott-Ouest had the largest activity volume, with 39,461
-roles, MRU 1.272 billion, and 2,851 anomalous roles. Nouakchott-Sud recorded
+roles, a raw mixed-currency amount sum of 1.272 billion, and 2,851 anomalous
+roles. This sum has no single monetary unit, is not an MRU value, and counts
+both sender and receiver roles rather than distinct monetary flows.
+Nouakchott-Sud recorded
 39,374 roles and 2,899 anomalies, while Nouakchott-Nord recorded 37,943 roles
 and 2,864 anomalies.
 
@@ -302,7 +332,7 @@ when that optional service is unavailable.
 
 ![Geographic activity and anomaly rates.](figures/geographic_analysis.png)
 
-*Figure 5. Sender and receiver activity volume and anomaly rate by wilaya.*
+*Figure 4. Sender and receiver activity volume and anomaly rate by wilaya.*
 
 ## 4. Impact
 
@@ -362,11 +392,11 @@ Résumer les contributions, les limites et les perspectives du logiciel.
 
 ## CRediT authorship contribution statement
 
+**Mohamedou Cheikh Tourad:** Supervision, Writing – review & editing, Project administration.
+
 **Seydna Aly Eby:** Conceptualization, Methodology, Software, Validation, Formal analysis, Investigation, Data curation, Writing – original draft, Visualization.
 
 **Eby Cheikhna Sidiboubacar:** Conceptualization, Methodology, Software, Validation, Formal analysis, Investigation, Data curation, Writing – original draft, Visualization.
-
-**Mohamedou Cheikh Tourad:** Supervision, Writing – review & editing, Project administration.
 
 ## Funding
 
@@ -390,7 +420,7 @@ The authors have no acknowledgements to declare.
 | C4 | Legal code licence | MIT via the repository-wide `LICENSE` file at the repository root |
 | C5 | Code versioning system | Git and GitHub |
 | C6 | Languages, tools, and services | Python, TypeScript, FastAPI, Pydantic, Pandas, scikit-learn, PyTorch, React, and Vite |
-| C7 | Requirements and operating environment | Python 3.10+, Node.js 18+; tested for this article on Windows 10; Linux and macOS procedures are documented but require final validation |
+| C7 | Requirements and operating environment | Python 3.11+, Node.js 18+; tested for this article on Windows 10; Linux and macOS procedures are documented but require final validation |
 | C8 | Developer documentation | <https://mauripay-analytics.readthedocs.io/fr/latest/> |
 | C9 | Support | <https://github.com/mauripay-analytics-teams/mauripay-analytics/issues> |
 

@@ -58,12 +58,12 @@ data/         datasets générés et fichiers chargés
 tests/        tests Python
 benchmarks/   scripts et résultats de performance
 docs/         documentation Sphinx et MyST
-notebooks/    expériences pédagogiques reproductibles
+backend/notebooks/    expériences pédagogiques reproductibles
 ```
 
 ## Installation rapide
 
-Prérequis : Python 3.10 ou supérieur, Node.js 18 ou supérieur, npm et Git.
+Prérequis : Python 3.11 ou supérieur, Node.js 18 ou supérieur, npm et Git.
 
 ```bash
 git clone https://github.com/mauripay-analytics-teams/mauripay-analytics.git
@@ -127,11 +127,11 @@ La documentation Read the Docs est disponible à l'adresse suivante :
 ## Notebooks pédagogiques
 
 Les trois expériences reproductibles de S14 se trouvent dans
-[`notebooks/`](notebooks/README.md). Après installation de leurs dépendances,
+[`backend/notebooks/`](backend/notebooks/README.md). Après installation de leurs dépendances,
 chaque notebook peut être exécuté avec **Kernel → Restart & Run All** :
 
 ```bash
-python -m pip install -r notebooks/requirements.txt
+python -m pip install -r backend/notebooks/requirements.txt
 jupyter notebook
 ```
 
