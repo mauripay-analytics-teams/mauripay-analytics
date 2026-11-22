@@ -388,7 +388,38 @@ continent where mobile money is a major component of financial inclusion
 
 ## 5. Conclusions
 
-Résumer les contributions, les limites et les perspectives du logiciel.
+MauriPay-Analytics provides an open-source platform for exploring Mobile Money
+transactions through an integrated workflow comprising synthetic transaction
+generation, Pydantic schema validation, feature engineering, anomaly detection,
+and visual analysis. Isolation Forest, Local Outlier Factor, and an autoencoder
+complement business rules, while a FastAPI application programming interface
+and a React dashboard expose the analytical capabilities. Two distinct
+experiments illustrate the software: exploration of a synthetic dataset of
+100,000 transactions containing 7,691 injected anomalies, and a chronological
+benchmark of 10,000 transactions partitioned into 8,000 training and 2,000
+evaluation records. In this benchmark, the autoencoder achieved the highest
+F1-score (0.8088) and recall (0.7914), whereas Isolation Forest achieved the
+highest precision (1.0000) and ROC-AUC (0.9448) among the three models.
+
+These results describe a controlled synthetic setting rather than validated
+performance on operational financial transactions. The evaluation uses a single
+random seed and a single temporal partition, and no validation on real
+transactions has been performed. Historical execution provenance remains
+partially unknown, and exact reproducibility is limited by incomplete
+run-specific records and environment specifications, as well as unseeded UUID
+generation. Historical execution times are excluded from the main comparison
+because their provenance is insufficiently documented. The reported detection
+metrics therefore support a bounded comparison within the documented benchmark,
+not a claim of general superiority or readiness for production fraud detection.
+
+Future work should evaluate the platform on appropriately authorised
+transaction data, repeat experiments across seeds and temporal partitions, and
+compare alternative ensemble strategies under consistent evaluation protocols.
+Further priorities include improving the explainability of alerts and
+strengthening security through systematic assessment of the API and deployment
+configuration. Together with more complete experiment manifests and preserved
+reference datasets, these developments would strengthen the evidence needed
+for reproducible research and subsequent operational evaluation.
 
 ## CRediT authorship contribution statement
 
