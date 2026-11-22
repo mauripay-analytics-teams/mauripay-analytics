@@ -12,7 +12,7 @@ import pandas as pd
 ROOT = Path(__file__).resolve().parents[1]
 PAPER = ROOT / "paper"
 FIGURES = PAPER / "figures"
-DATASET = ROOT / "data" / "generated" / "mauripay_m_notebook_100k.parquet"
+DATASET = ROOT / "data" / "generated" / "mauripay_m_100k.csv"
 RESULTS = PAPER / "tables" / "model_results.csv"
 
 FIGURES.mkdir(parents=True, exist_ok=True)
@@ -92,9 +92,10 @@ def benchmark_figures() -> None:
 def data_figures() -> None:
     if not DATASET.exists():
         raise FileNotFoundError(
-            f"Missing {DATASET}. Run notebook 01 with Restart & Run All first."
+            f"Missing {DATASET}. Supply the documented reference CSV; "
+            "no dataset is generated automatically."
         )
-    data = pd.read_parquet(DATASET)
+    data = pd.read_csv(DATASET)
     anomaly = data["is_anomaly"].astype(str).str.lower().isin(["true", "1", "yes"])
 
     counts = data.loc[anomaly, "anomaly_type"].value_counts().sort_values()

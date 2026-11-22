@@ -227,11 +227,16 @@ is higher than the 2% isolated-anomaly parameter because the structuring and
 high-frequency generators create multi-transaction sequences.
 
 These counts are recorded in the saved outputs of notebook 01 for
-`data/generated/mauripay_m_notebook_100k.parquet`. The historical full-dataset
+`data/generated/mauripay_m_notebook_100k.parquet`, which is no longer available
+locally. Notebook 01 and the publication figure script now read the available
+`data/generated/mauripay_m_100k.csv`. Its descriptive and geographic aggregates
+were checked against the recorded results; this does not establish identity
+with every transaction in the historical Parquet. Its former SHA-256 remains
+documented as a historical reference. The historical full-dataset
 benchmark JSON instead records 6,548 anomalies under the path
 `data/generated/mauripay_m_100k.csv`. Inspection of the current local file at
 that path finds 7,691 anomalies, not 6,548. Thus its current content cannot
-authenticate the historical benchmark dataset. The notebook Parquet contains
+authenticate the historical benchmark dataset. The saved notebook records
 7,691 anomalies, with 92,222 MRU, 4,878 XOF, and 2,900 USD transactions.
 The exact cause of the historical discrepancy remains unverified; neither
 results nor current file fingerprints establish identity with the old input.
@@ -324,9 +329,10 @@ High-volume wilayas naturally contribute more anomalous observations. For
 example, Nouakchott-Ouest had 2,851 anomalous roles but an anomaly rate of
 7.22%, whereas Guidimakha had only 444 anomalous roles but a higher rate of
 11.57%. Both the denominator and historical activity therefore need to be
-considered. The bubble map uses approximate administrative coordinates, bubble
-size for activity volume, and colour for anomaly rate. It is an exploratory
-visualisation rather than a precise GPS or routing map. The notebook can compare
+considered. Figure 4 uses horizontal bar charts to show sender and receiver
+activity volume and the percentage of anomalous roles by wilaya. It is an
+exploratory comparison of administrative regions, not a GPS or routing map.
+The notebook also provides a separate geographic map and can compare
 its local results with `/geo` when the API is running, but remains executable
 when that optional service is unavailable.
 

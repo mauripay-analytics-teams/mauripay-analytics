@@ -70,9 +70,12 @@ python benchmarks/run_benchmark.py \
 
 Dataset : `data/generated/mauripay_m_100k.csv`.
 
-Le JSON historique enregistre 6 548 anomalies. Le notebook 01 utilise un autre
-fichier, `data/generated/mauripay_m_notebook_100k.parquet`, dont les sorties
-sauvegardées enregistrent 7 691 anomalies. Leurs effectifs ne sont pas
+Le JSON historique enregistre 6 548 anomalies. Les sorties historiques du
+notebook 01 enregistrent 7 691 anomalies pour
+`data/generated/mauripay_m_notebook_100k.parquet`, désormais absent. Le notebook
+lit maintenant le CSV `data/generated/mauripay_m_100k.csv` disponible, dont les
+agrégats concordent avec les résultats descriptifs et géographiques, sans preuve
+d'identité avec le Parquet disparu. Ces expériences ne sont pas
 interchangeables. Le JSON ne fournit ni empreinte du dataset, ni commit du
 générateur, ni tous les paramètres de génération. La cause exacte de cette
 différence reste **NON VÉRIFIÉE** ; une nouvelle exécution du code actuel ne

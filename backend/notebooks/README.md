@@ -14,7 +14,7 @@ python -m pip install -r backend/notebooks/requirements.txt
 
 ## Notebooks
 
-1. `01_generation_et_exploration.ipynb` : génération du scénario MauriPay-M 100K et analyse exploratoire ;
+1. `01_generation_et_exploration.ipynb` : lecture du CSV MauriPay-M 100K existant et analyse exploratoire, sans génération automatique ;
 2. `02_benchmark_detection.ipynb` : comparaison Isolation Forest, LOF et autoencoder ;
 3. `03_analyse_geographique.ipynb` : agrégats et visualisations par wilaya.
 
@@ -33,7 +33,7 @@ trouvent cette racine en remontant depuis le répertoire courant.
 
 | Notebook | Entrée dans `data/generated/` | Sorties dans `backend/notebooks/outputs/` |
 |---|---|---|
-| 01 | `mauripay_m_notebook_100k.parquet` ; génération si absent | `01_generation/` : cinq figures PNG |
+| 01 | `mauripay_m_100k.csv` ; erreur si absent, aucune génération | `01_generation/` : cinq figures PNG |
 | 02 | `mauripay_s_notebook_10k.parquet` ; génération si absent | `02_benchmark/` : `comparaison_modeles.csv`, deux figures PNG |
 | 03 | Premier fichier présent : `mauripay_m_notebook_100k.parquet`, puis `mauripay_m_100k.csv` ; sinon génération du premier | `03_geographie/` : `agregats_par_wilaya.csv`, trois figures PNG |
 
@@ -43,21 +43,27 @@ l'ancien chemin `notebooks/outputs/` ; elles n'ont pas été réexécutées.
 Le notebook 03 compte les rôles expéditeur et destinataire : le total des
 volumes géographiques vaut deux fois le nombre de transactions. Son appel
 optionnel à `http://127.0.0.1:8000/geo` ne remplace pas l'analyse locale.
-Exécuter 01 avant 03 évite de sélectionner involontairement le CSV historique.
+Le Parquet 100K historique est absent. Le notebook 03 sélectionne donc le CSV
+100K existant grâce à son repli déjà implémenté. Il ne faut pas confondre ce
+CSV à 7 691 anomalies avec l'entrée historique non authentifiée à 6 548 anomalies.
 
 ## Commandes de génération documentées — non exécutées lors de l'audit
 
 Depuis la racine, avec le backend déjà installé, les commandes suivantes
-expriment les paramètres utilisés par les notebooks 01 et 02. Elles écrivent
-les fichiers indiqués : ne pas les lancer sur un fichier de référence à conserver.
+décrivent la génération séparée et les paramètres historiques des notebooks.
+Le notebook 01 n'exécute plus de génération. La commande 100K écrit un fichier
+nouveau distinct, pas l'entrée de référence du manuscrit ni le Parquet disparu.
+Ces commandes ne sont pas exécutées lors de cette correction et ne doivent
+pas écraser un fichier de référence à conserver.
 
 ```bash
-python -m mauripay.synthetic.generator --rows 100000 --accounts 5000 --start-date 2026-01-01 --end-date 2026-03-31 --seed 42 --anomaly-rate 0.02 --tontine-rate 0.001 --structuring-rate 0.003 --high-frequency-rate 0.002 --output data/generated/mauripay_m_notebook_100k.parquet
+python -m mauripay.synthetic.generator --rows 100000 --accounts 5000 --start-date 2026-01-01 --end-date 2026-03-31 --seed 42 --anomaly-rate 0.02 --tontine-rate 0.001 --structuring-rate 0.003 --high-frequency-rate 0.002 --output data/generated/mauripay_m_new_100k.csv
 python -m mauripay.synthetic.generator --rows 10000 --accounts 5000 --start-date 2026-01-01 --end-date 2026-03-31 --seed 42 --anomaly-rate 0.02 --tontine-rate 0.001 --structuring-rate 0.003 --high-frequency-rate 0.002 --output data/generated/mauripay_s_notebook_10k.parquet
 ```
 
 Le générateur CLI appelle `generate_transactions` puis `export_transactions`.
-Les notebooks font les mêmes appels, mais **rechargent un fichier existant**.
+Le notebook 01 lit uniquement le CSV de référence existant. Les notebooks 02
+et 03 peuvent générer une entrée si elle manque, sinon ils la rechargent.
 La graine affichée ne prouve donc pas la provenance d'un fichier préexistant.
 Le notebook 02 utilise les valeurs par défaut de génération explicitées ici.
 Le notebook 03 utilise aussi ces valeurs s'il doit générer le jeu 100K.
@@ -100,12 +106,12 @@ Ce runner ne reproduit pas le protocole chronologique du manuscrit.
 
 | Source | Contenu observable | Limite |
 |---|---|---|
-| Notebook 01, sorties intégrées | 100 000 lignes ; 7 691 anomalies : 4 040 HIGH_FREQUENCY, 1 780 STRUCTURING, 960 HIGH_AMOUNT, 534 OPERATOR_OUTAGE, 377 UNUSUAL_LOCATION | Dataset de référence non suivi dans Git ; empreinte et commit de génération absents |
+| Notebook 01, sorties intégrées | 100 000 lignes ; 7 691 anomalies : 4 040 HIGH_FREQUENCY, 1 780 STRUCTURING, 960 HIGH_AMOUNT, 534 OPERATOR_OUTAGE, 377 UNUSUAL_LOCATION | Parquet historique absent ; source actuelle CSV 100K aux agrégats vérifiés, empreintes documentées, commit de génération non authentifié |
 | `benchmarks/results/full_100k_benchmark.json` | 100 000 lignes, 6 548 anomalies ; CSV `mauripay_m_100k.csv` ; trois modèles | Ancien artefact distinct ; cause exacte de l'écart d'effectifs **NON VÉRIFIÉE** |
 | Notebook 02 et `outputs/02_benchmark/comparaison_modeles.csv` | Métriques et temps concordants entre ces deux artefacts | Pas de manifeste d'exécution complet |
 | `paper/tables/model_results.csv` | Mêmes métriques à l'arrondi et mêmes alertes que le notebook 02 | Temps différents ; provenance de ces temps **NON VÉRIFIÉE** |
 | `benchmarks/results/full_10k_benchmark.json` | 10 000 lignes, 680 anomalies, résultat AE uniquement | Le rapport `benchmarks/results_full.md` contient trois modèles ; JSON incomplet pour cette comparaison |
-| `paper/generate_figures.py` | Lit le Parquet 100K du notebook et le CSV de l'article | Ne mesure pas de nouveaux temps ; les figures de benchmark héritent du CSV de l'article |
+| `paper/generate_figures.py` | Lit le CSV 100K disponible et le CSV de l'article | Ne mesure pas de nouveaux temps ; les figures de benchmark héritent du CSV de l'article |
 
 Les paramètres par défaut actuels ne suffisent pas à expliquer les deux jeux
 100K historiques : aucun résultat ne doit être remplacé par celui de l'autre
@@ -113,8 +119,9 @@ protocole. Le paramètre 0.02 concerne les anomalies simples ; les événements
 de structuration et de haute fréquence produisent plusieurs lignes. Il ne
 fixe donc pas le taux final d'anomalies à 2 %.
 
-**Contrôle des fichiers locaux actuels :** le Parquet 100K contient bien
-7 691 anomalies, mais le CSV `mauripay_m_100k.csv` présent contient lui aussi
+**Contrôle des fichiers locaux actuels :** le Parquet 100K historique est
+absent ; son relevé antérieur indiquait 7 691 anomalies. Le CSV
+`mauripay_m_100k.csv` présent contient
 7 691 anomalies, contrairement aux 6 548 du JSON historique. Le Parquet 10K
 contient 765 anomalies (139 sur les 2 000 dernières lignes chronologiques) ;
 le CSV `mauripay_s_10k.csv` présent en contient 543, contre 680 dans l'ancien
