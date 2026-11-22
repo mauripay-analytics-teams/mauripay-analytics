@@ -6,7 +6,7 @@ aucune expérience réexécutée. Les empreintes ci-dessous identifient les fich
 locaux présents, pas automatiquement les entrées historiques. Un nom de fichier,
 un effectif ou des métriques proches ne suffisent pas à prouver cette identité.
 
-## Datasets présents et empreintes SHA-256
+## Datasets disponibles et référence historique absente
 
 Les empreintes sont calculées sur tous les octets des fichiers, sans modifier
 leur contenu. Les effectifs sont lus dans les fichiers 10K/100K ; seuls les
@@ -14,16 +14,21 @@ octets du fichier 1M sont lus pour son empreinte, sans recalcul d'expérience.
 
 | Fichier dans `data/generated/` | Octets | Lignes / anomalies constatées | SHA-256 |
 |---|---:|---|---|
-| `mauripay_m_notebook_100k.parquet` | 6618247 | 100000 / 7691 | `110969ca9474da854f73c1491b363eafe2d173e6599664bada441278568d8f92` |
+| `mauripay_m_notebook_100k.parquet` **ABSENT — référence historique** | 6618247 (historique) | 100000 / 7691 (historique) | `110969ca9474da854f73c1491b363eafe2d173e6599664bada441278568d8f92` |
 | `mauripay_m_100k.csv` | 17830053 | 100000 / 7691 | `32019dc6c92f1f7c3ebb8bfb689de00b766a35b2cbc350ec5e8aa4abd7aa3aa3` |
 | `mauripay_s_notebook_10k.parquet` | 739111 | 10000 / 765 ; 139 anomalies sur les 2000 dernières lignes chronologiques | `4b5fcfbe486305a4ccdcfacbe48c308af5713a645c01d7c7bc67cfc7518da838` |
 | `mauripay_s_10k.csv` | 1786523 | 10000 / 543 | `596529f1bf2b5eb44c9ea12436d385b076437c293191852c2917a4b15435103f` |
 | `mauripay_l_1m.parquet` | 63156556 | Effectifs non recomptés pendant cette inspection | `46bd9d6283763359b849b3b5b23e5ca9a3501067e345998377906e0e9a2d0083` |
 
-Le Parquet 100K et le CSV 100K actuels présentent chacun 92222 lignes MRU,
-4878 XOF et 2900 USD ; chacun contient 4040 HIGH_FREQUENCY, 1780 STRUCTURING,
-960 HIGH_AMOUNT, 534 OPERATOR_OUTAGE et 377 UNUSUAL_LOCATION. Ces comptages
-concordants ne démontrent pas l'identité de toutes leurs transactions.
+Le Parquet 100K a été supprimé localement ; sa taille, ses effectifs et son
+SHA-256 ci-dessus proviennent du relevé antérieur, pas d'une vérification
+actuelle de ce fichier absent. Le CSV 100K disponible présente 92222 lignes
+MRU, 4878 XOF et 2900 USD ; il contient 4040 HIGH_FREQUENCY, 1780 STRUCTURING,
+960 HIGH_AMOUNT, 534 OPERATOR_OUTAGE et 377 UNUSUAL_LOCATION.
+Il est désormais la source disponible du notebook 01 et du script de figures.
+Les agrégats descriptifs du manuscrit et les cinq colonnes du tableau
+géographique sauvegardé ont été vérifiés à partir de ce CSV. Cette concordance
+ne démontre pas l'identité de toutes les transactions avec le Parquet disparu.
 
 Le JSON `benchmarks/results/full_100k_benchmark.json` enregistre en revanche
 100000 lignes, **6548 anomalies** et 93452 normales, sous le chemin du CSV 100K.
@@ -33,13 +38,14 @@ Même constat pour le JSON 10K : 680 anomalies enregistrées, contre 543 dans le
 CSV actuel. Aucune cause de remplacement ou de modification passée des données
 n'est déduite de cette différence.
 
-Les quatre datasets 10K/100K ne sont pas suivis dans Git ; leur présence locale
-ne prouve pas leur disponibilité publique. Aucun nouvel archivage n'est réalisé.
+Les trois datasets 10K/100K encore disponibles dans cette table ne sont pas
+suivis dans Git ; leur présence locale ne prouve pas leur disponibilité
+publique. Aucun nouvel archivage n'est réalisé.
 Pour vérifier un fichier disponible, sous PowerShell :
 
 ```powershell
-Get-FileHash -Algorithm SHA256 -LiteralPath data/generated/mauripay_m_notebook_100k.parquet
 Get-FileHash -Algorithm SHA256 -LiteralPath data/generated/mauripay_m_100k.csv
+Get-FileHash -Algorithm SHA256 -LiteralPath data/generated/mauripay_s_notebook_10k.parquet
 ```
 
 ## Artefacts historiques et commits de stockage
@@ -63,7 +69,7 @@ l'artefact, pas une preuve indépendante de l'environnement ou du commit.
 
 | Expérience | Entrée référencée | Paramètres observables et graine |
 |---|---|---|
-| Exploration du notebook 01 | Parquet 100K ; génération seulement si absent | 100000 lignes, 5000 comptes par défaut, 2026-01-01 à 2026-03-31 par défaut, seed 42, anomalies simples 0.02, tontines 0.001, structuring 0.003, haute fréquence 0.002 |
+| Exploration du notebook 01 | Historiquement Parquet 100K (absent) ; lecture actuelle du CSV 100K sans génération automatique | Génération historique décrite : 100000 lignes, 5000 comptes par défaut, 2026-01-01 à 2026-03-31 par défaut, seed 42, anomalies simples 0.02, tontines 0.001, structuring 0.003, haute fréquence 0.002 ; cela n'authentifie pas l'exécution ayant créé le CSV |
 | Benchmark du notebook 02 | Parquet 10K ; tri temporel 8000/2000 | IF 100 arbres, contamination 0.02, random_state 42 ; LOF 20 voisins, contamination 0.02, Minkowski ; AE hidden_dims (32,16), latent 8, 10 époques, batch 128, percentile 98, CPU, random_state 42 |
 | Géographie du notebook 03 | Premier fichier présent : Parquet 100K, puis CSV 100K | Agrégation des rôles expéditeur et destinataire ; génération si aucun fichier disponible avec seed 42 et paramètres par défaut ; pas d'entraînement |
 | Ancien JSON full 10K | Chemin du CSV 10K ; contenu actuel différent | AE seul enregistré : 50 époques, batch 128, latent 8, hidden_dims (32,16), percentile 98, random_state 42, input_dim 139, seuil 0.3902172499895058 |
