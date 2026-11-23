@@ -6,6 +6,32 @@ aucune expérience réexécutée. Les empreintes ci-dessous identifient les fich
 locaux présents, pas automatiquement les entrées historiques. Un nom de fichier,
 un effectif ou des métriques proches ne suffisent pas à prouver cette identité.
 
+## Archives publiques versionnées
+
+Les métadonnées publiques Zenodo ont été consultées le 23 novembre 2026 :
+
+- Logiciel **MauriPay-Analytics**, version `v0.2.0`, publié le 22 novembre
+  2026 sous licence MIT : <https://doi.org/10.5281/zenodo.24448001>.
+- **MauriPay-Analytics: Synthetic Mobile Money Reference Datasets and
+  Scientific Artifacts**, version `0.2.0`, publié le 22 novembre 2026 :
+  <https://doi.org/10.5281/zenodo.24446877>. Les datasets sont sous CC BY 4.0,
+  le code accompagnateur sous MIT.
+
+Le dépôt des datasets fournit les fichiers `mauripay_m_100k.csv` et
+`mauripay_s_notebook_10k.parquet` avec les artefacts scientifiques. La notice
+publique indique un ZIP de 7253547 octets, MD5
+`bd9b808913f4894cfc8da71f81f10481`, correspondant au ZIP local contrôlé.
+Les SHA-256 ci-dessous restent les empreintes des datasets, pas du ZIP.
+
+La publication rend ces références disponibles ; elle n'authentifie pas les
+commits ou environnements d'exécution historiques. Elle ne restaure ni le
+Parquet 100K supprimé ni les anciennes entrées à 6548 ou 680 anomalies. Aucune
+expérience supplémentaire n'est revendiquée et aucun DOI d'article SoftwareX
+n'est attribué ici. Les noms et l'ordre bibliographiques suivent les métadonnées
+validées du projet : la notice publique du logiciel conserve une inversion
+prénom/nom à corriger ; les affiliations du dépôt de données ne sont pas
+renseignées dans ses métadonnées publiques.
+
 ## Datasets disponibles et référence historique absente
 
 Les empreintes sont calculées sur tous les octets des fichiers, sans modifier
@@ -38,9 +64,12 @@ Même constat pour le JSON 10K : 680 anomalies enregistrées, contre 543 dans le
 CSV actuel. Aucune cause de remplacement ou de modification passée des données
 n'est déduite de cette différence.
 
-Les trois datasets 10K/100K encore disponibles dans cette table ne sont pas
-suivis dans Git ; leur présence locale ne prouve pas leur disponibilité
-publique. Aucun nouvel archivage n'est réalisé.
+Les datasets de cette table ne sont pas suivis dans Git. Seuls le CSV 100K
+et le Parquet 10K de référence sont inclus dans l'archive publique citée
+ci-dessus ; les autres lignes restent des références locales ou historiques.
+La disponibilité publique de ce paquet ne démontre pas l'identité avec les
+entrées historiques absentes. Aucun nouvel archivage n'est réalisé lors de
+cette mise à jour documentaire.
 Pour vérifier un fichier disponible, sous PowerShell :
 
 ```powershell
