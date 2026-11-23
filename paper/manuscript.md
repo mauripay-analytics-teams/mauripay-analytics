@@ -7,8 +7,6 @@
 
 **Corresponding author:** Mohamedou Cheikh Tourad, cheikhtouradmohamedou@gmail.com
 
-> Manuscrit SoftwareX — version de travail S15.
-
 ## Abstract
 
 Mobile money services have expanded access to digital payments across Africa,
@@ -31,6 +29,8 @@ interactive visualisation in a single extensible package, MauriPay-Analytics
 supports teaching, reproducible research, prototyping by payment operators, and
 exploratory analysis by regulators in Mauritania and the wider West African
 region.
+
+**Keywords:** Mobile Money; anomaly detection; synthetic data; machine learning; Mauritania.
 
 ## 1. Motivation and significance
 
@@ -81,6 +81,10 @@ digital-payment objectives [@bcm2023snif; @bcmDigitalPayments].
 
 ## 2. Software description
 
+The software described here is MauriPay-Analytics v0.2.0, archived on Zenodo
+[@mauripay2026software] at
+[https://doi.org/10.5281/zenodo.24448001](https://doi.org/10.5281/zenodo.24448001).
+
 ### 2.1 Software architecture
 
 MauriPay-Analytics separates responsibilities into five layers. The data layer
@@ -106,8 +110,8 @@ contains the Sphinx and MyST technical documentation.
 ### 2.2 Data model
 
 The canonical transaction schema is implemented as a Pydantic v2 model. Each
-record contains a transaction identifier and UTC timestamp; anonymised sender
-and receiver identifiers; amount, currency, and fees; transaction type,
+record contains a transaction identifier and UTC timestamp; synthetic account
+identifiers for senders and receivers; amount, currency, and fees; transaction type,
 channel, operator, and status; sender and receiver wilayas; a Ramadan flag;
 optional bill-provider and origin-country fields; and the synthetic ground-truth
 fields `is_anomaly` and `anomaly_type`. Supported operations include transfers,
@@ -136,8 +140,11 @@ tontines.
 
 Five labelled anomaly families can be injected: unusually high amounts, high
 transaction frequency, structuring through multiple smaller operations,
-operator-outage sequences, and unusual locations. Sequence-based injections
-may generate several anomalous rows; therefore, the final fraction of labelled
+operator-outage-labelled failures, and unusual locations. The operator-outage
+injection marks an individual transaction as failed with zero fees; it does
+not guarantee a coordinated sequence of failures or a simulated outage period.
+Structuring and high-frequency injections may generate several anomalous rows;
+therefore, the final fraction of labelled
 rows can exceed the parameter controlling isolated anomalies. Dataset size and
 the rates of simple anomalies, tontines, structuring, and high-frequency events
 are configurable.
@@ -170,12 +177,24 @@ The neural autoencoder learns to reconstruct normal feature vectors, and a high
 reconstruction error indicates behaviour that differs from its training
 distribution [@hinton2006dimensionality].
 
-Each detector returns an anomaly score, a decision threshold, and a binary
-label. Raw scores are model-specific and should not be compared directly across
-algorithms. The software also provides an ensemble decision and interpretable
-business-rule signals for high amounts, failures without fees, high frequency,
-structuring, operator outages, and unusual locations. These outputs identify
-transactions requiring investigation; they do not constitute proof of fraud.
+The standard detector result contains a binary label (`anomaly_label`), an
+anomaly score (`anomaly_score`), and an algorithm identifier (`algorithm`).
+Decision thresholds are model-specific and are not an additional column in
+this standard result. Raw scores should not be compared directly across
+algorithms. The prediction workflow also provides interpretable business-rule
+signals for high amounts, failures without fees, high frequency, structuring,
+operator-outage-related failures, and unusual locations.
+
+The ensemble combines the three input decision labels using
+`(IF AND LOF) OR (AE AND NOT IF AND NOT LOF)`. It raises an alert when IF and
+LOF agree, regardless of AE, or when AE alone raises an alert. AE combined
+with exactly one of IF or LOF is not sufficient under this rule; it is not
+a majority vote. These are the decision labels supplied by the prediction
+workflow, which can include business-rule enrichment. Table 1 compares the
+three detectors individually, without this ensemble or post-prediction
+business-rule enrichment; it does not evaluate the ensemble's performance.
+These outputs identify transactions requiring investigation; they do not
+constitute proof of fraud.
 
 ### 2.6 API and dashboard
 
@@ -198,6 +217,10 @@ which keeps programmatic and visual results consistent.
 ## 3. Illustrative examples
 
 ### 3.1 Dataset generation and exploration
+
+The available reference datasets and accompanying scientific artifacts are
+archived separately as version 0.2.0 [@mauripay2026datasets] at
+[https://doi.org/10.5281/zenodo.24446877](https://doi.org/10.5281/zenodo.24446877).
 
 The first notebook generated a MauriPay-M 100K dataset of 100,000 transactions with
 the fixed seed 42. The timestamps cover 1 January to 31 March 2026. The dataset
@@ -241,10 +264,12 @@ authenticate the historical benchmark dataset. The saved notebook records
 The exact cause of the historical discrepancy remains unverified; neither
 results nor current file fingerprints establish identity with the old input.
 
-The corresponding channel, amount, Ramadan, and anomaly-distribution figures
-are generated by `01_generation_et_exploration.ipynb` and are intended for
-inclusion as publication figures after final visual validation. Figure 2
-summarises the five injected anomaly families.
+The saved outputs of `01_generation_et_exploration.ipynb` include channel,
+amount, Ramadan, and anomaly-distribution plots. The manuscript includes the
+anomaly-distribution plot as Figure 2, which summarises the five injected
+anomaly families. The publication figure script, `paper/generate_figures.py`,
+reads the available reference CSV to construct this figure; no new dataset
+or detection experiment is implied by plotting these recorded data.
 
 ![Distribution of injected anomaly types.](figures/anomaly_distribution.png)
 
@@ -256,11 +281,14 @@ pattern.*
 The second notebook compared Isolation Forest [@liu2008isolation], Local
 Outlier Factor [@breunig2000lof], and an autoencoder
 [@hinton2006dimensionality]. The 10,000 transactions were sorted by timestamp;
-the first 8,000 formed the training set and the final 2,000 formed an independent
+the first 8,000 formed the training set and the final 2,000 formed a held-out
 temporal evaluation set containing 139 labelled anomalies. Preprocessors were
 fitted only on training data. The autoencoder preprocessor and detector were
 trained on the normal training subset. Table 1 reports detection metrics that
 agree with the saved notebook results to the reported precision.
+The reference input is `mauripay_s_notebook_10k.parquet`, included in the
+dataset archive [@mauripay2026datasets]; it is distinct from the historical
+full-dataset CSV benchmarks.
 
 **Table 1. Detection results on the temporal evaluation set.**
 
@@ -449,11 +477,33 @@ The authors have no acknowledgements to declare.
 
 ## Code metadata
 
+### Code and data availability
+
+MauriPay-Analytics v0.2.0 is publicly archived on Zenodo under the MIT license
+[@mauripay2026software]:
+[https://doi.org/10.5281/zenodo.24448001](https://doi.org/10.5281/zenodo.24448001).
+The development repository is
+[GitHub](https://github.com/mauripay-analytics-teams/mauripay-analytics).
+
+The reference datasets and scientific artifacts, version 0.2.0, are archived
+separately [@mauripay2026datasets]:
+[https://doi.org/10.5281/zenodo.24446877](https://doi.org/10.5281/zenodo.24446877).
+The synthetic datasets are licensed under CC BY 4.0; accompanying source code
+retains MIT. The archive includes `mauripay_m_100k.csv` and
+`mauripay_s_notebook_10k.parquet`, notebooks, recorded results, figures, and
+provenance documentation. It does not restore the deleted historical 100K
+Parquet or authenticate the missing inputs of older full-dataset benchmarks.
+Archival availability does not establish exact historical reproducibility:
+execution commits and run-specific environments remain partly unverified,
+and the CSV 100K is not claimed to be transaction-identical to the deleted
+Parquet. These limitations are detailed in
+[results_provenance.md](results_provenance.md).
+
 | Nr. | Code metadata description | Value |
 |---|---|---|
 | C1 | Current code version | 0.2.0 |
-| C2 | Permanent link to code/repository used for this version | Not yet available; to be completed after the final tagged release and archival deposit. Working repository: <https://github.com/mauripay-analytics-teams/mauripay-analytics> |
-| C3 | Permanent link to reproducible capsule | Not available; reproducible notebooks are included in the repository |
+| C2 | Permanent link to code/repository used for this version | Software v0.2.0: <https://doi.org/10.5281/zenodo.24448001> |
+| C3 | Permanent link to reproducible capsule | Datasets and scientific artifacts v0.2.0: <https://doi.org/10.5281/zenodo.24446877>; not an independently validated executable reproduction capsule |
 | C4 | Legal code licence | MIT via the repository-wide `LICENSE` file at the repository root |
 | C5 | Code versioning system | Git and GitHub |
 | C6 | Languages, tools, and services | Python, TypeScript, FastAPI, Pydantic, Pandas, scikit-learn, PyTorch, React, and Vite |
@@ -462,11 +512,21 @@ The authors have no acknowledgements to declare.
 | C9 | Support | <https://github.com/mauripay-analytics-teams/mauripay-analytics/issues> |
 
 The extended machine-readable metadata are provided in
-[tables/software_metadata.csv](tables/software_metadata.csv). SoftwareX asks
-authors to provide a permanent link for the exact submitted version. Therefore,
-the final submission should reference a tagged release archived in a repository
-that issues a persistent identifier, rather than the mutable `eby`, `develop`,
-or `main` branch alone.
+[tables/software_metadata.csv](tables/software_metadata.csv). The two Zenodo
+references identify the software release and the separate dataset/artifact
+deposit. The mutable `eby`, `develop`, and `main` branches are development
+references, not substitutes for these versioned archives. Neither DOI is the
+DOI of this SoftwareX article, which has not been assigned.
+
+## Declaration of generative AI and AI-assisted technologies in the manuscript preparation process
+
+An OpenAI generative AI assistant was used during manuscript preparation to
+assist with drafting and revising text, including an initial conclusion draft,
+language editing, and checks of consistency between the manuscript, source
+code, references, and recorded results. This assistance does not establish
+experimental reproducibility or provide new scientific evidence. The authors
+are responsible for reviewing the assisted text and verifying the references,
+technical claims, interpretations, and conclusions.
 
 ## References
 

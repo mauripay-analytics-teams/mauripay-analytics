@@ -3,6 +3,8 @@ message: "If you use MauriPay-Analytics, please cite this software."
 type: software
 title: MauriPay-Analytics
 version: 0.2.0
+doi: 10.5281/zenodo.24448001
+date-released: 2026-11-22
 authors:
   - given-names: "Mohamedou Cheikh"
     family-names: "Tourad"
